@@ -61,3 +61,37 @@ not inside the API.
 ## 🔌 API Design
 
 ### Health Check
+
+--------------------------------------------------------------------------
+
+## 🏗️ System Design & Architecture
+
+This project follows a clear separation of concerns between
+model training, inference, and data engineering workflows.
+
+### 1️⃣ Model Training (Offline)
+- Data preprocessing and feature engineering performed offline
+- ML pipeline created using scikit-learn
+- Model evaluated using metrics like confusion matrix, precision, recall, and ROC-AUC
+- Trained pipeline saved as a serialized artifact (`joblib`)
+
+### 2️⃣ Real-Time Inference (FastAPI)
+- FastAPI service loads the trained model once at startup
+- Input data is validated using Pydantic schemas
+- Feature name mapping is applied to ensure compatibility with training schema
+- API returns prediction, label, and confidence score
+- Designed for low-latency, single-record predictions
+
+### 3️⃣ Batch Inference (Data Engineering Workflow)
+- Batch job reads input data from CSV
+- Input schema and null checks are performed before prediction
+- Feature names are mapped to training format
+- Model is reused for batch scoring
+- Predictions and probabilities are written back to an output CSV
+- Structured logging is used for observability and debugging
+
+### 4️⃣ Production Considerations
+- Separation of training and inference
+- Fail-fast validation to prevent silent data issues
+- Logging instead of print statements
+- Batch and real-time inference supported using the same model artifact
