@@ -53,6 +53,8 @@ FEATURE_NAME_MAPPING = {
     "worst_fractal_dimension": "worst fractal dimension"
 }
 
+REQUIRED_COLUMNS = set(FEATURE_NAME_MAPPING.keys())
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
@@ -65,6 +67,22 @@ def main():
     df = pd.read_csv(INPUT_CSV_PATH)
     logger.info("✅ Input CSV loaded")
     logger.info(df.head())
+
+    input_columns = set(df.columns)
+    missing_columns = REQUIRED_COLUMNS - input_columns
+
+    if missing_columns:
+        logger.error(f"Missing required columns: {missing_columns}")
+        raise ValueError("Input CSV schema validation failed")
+
+    logger.info("Input schema validation passed")
+
+    # Check for null values
+    if df.isnull().any().any():
+        logger.error("Input CSV contains null values")
+        raise ValueError("Null values found in input data")
+
+    logger.info("No null values found in input data")
 
     # Rename columns to match training feature names
     df.rename(columns=FEATURE_NAME_MAPPING, inplace=True)
