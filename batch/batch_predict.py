@@ -69,5 +69,19 @@ def main():
     # For now, just confirm shapes
     print(f"Input shape: {df.shape}")
 
+    predictions = model.predict(df)
+    probabilities = model.predict_proba(df)
+
+    label_map = {0: "malignant", 1: "benign"}
+
+    df["prediction_code"] = predictions
+    df["prediction"] = [label_map[p] for p in predictions]
+    df["probability"] = probabilities.max(axis=1)
+
+    output_path = os.path.join(BASE_DIR, "batch", "predictions_output.csv")
+    df.to_csv(output_path, index=False)
+
+    print(f"✅ Predictions saved to {output_path}")
+
 if __name__ == "__main__":
     main()
