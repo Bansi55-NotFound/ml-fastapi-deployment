@@ -8,6 +8,7 @@ and writes predictions to output CSV.
 import os
 import joblib
 import pandas as pd
+import logging
 
 # Get project root directory
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,22 +53,29 @@ FEATURE_NAME_MAPPING = {
     "worst_fractal_dimension": "worst fractal dimension"
 }
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
 def main():
     #load input data
     df = pd.read_csv(INPUT_CSV_PATH)
-    print("✅ Input CSV loaded")
-    print(df.head())
+    logger.info("✅ Input CSV loaded")
+    logger.info(df.head())
 
     # Rename columns to match training feature names
     df.rename(columns=FEATURE_NAME_MAPPING, inplace=True)
-    print("✅ Feature names mapped to training format")
+    logger.info("✅ Feature names mapped to training format")
 
     #load trained model
     model=joblib.load(MODEL_PATH)
-    print("✅ ML model loaded successfully")
+    logger.info("✅ ML model loaded successfully")
 
     # For now, just confirm shapes
-    print(f"Input shape: {df.shape}")
+    logger.info(f"Input shape: {df.shape}")
 
     predictions = model.predict(df)
     probabilities = model.predict_proba(df)
@@ -81,7 +89,7 @@ def main():
     output_path = os.path.join(BASE_DIR, "batch", "predictions_output.csv")
     df.to_csv(output_path, index=False)
 
-    print(f"✅ Predictions saved to {output_path}")
+    logger.info(f"✅ Predictions saved to {output_path}")
 
 if __name__ == "__main__":
     main()
