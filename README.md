@@ -95,3 +95,69 @@ model training, inference, and data engineering workflows.
 - Fail-fast validation to prevent silent data issues
 - Logging instead of print statements
 - Batch and real-time inference supported using the same model artifact
+
+## ⚙️ Inference Strategies: API vs Batch vs Spark
+
+This project demonstrates multiple inference strategies depending on
+data volume and latency requirements.
+
+### 🔹 1. Real-Time Inference (FastAPI)
+**Use when:**
+- Low-latency predictions are required
+- Single record or small payloads
+- Integration with applications or services
+
+**Example:**
+- User submits data via API
+- Immediate prediction response
+
+**Tech:**
+- FastAPI
+- Pydantic validation
+- scikit-learn pipeline
+
+---
+
+### 🔹 2. Batch Inference (Pandas)
+**Use when:**
+- Periodic batch predictions (daily/weekly)
+- Data fits in memory
+- Simpler batch workflows
+
+**Example:**
+- CSV file with multiple records
+- Output predictions written to CSV
+
+**Tech:**
+- Pandas
+- scikit-learn
+- Structured logging
+- Schema & null validation
+
+---
+
+### 🔹 3. Scalable Batch Inference (Spark + Pandas)
+**Use when:**
+- Large datasets
+- Distributed ingestion and validation required
+- ML model is built using scikit-learn
+
+**Design Choice:**
+- Spark is used for data loading, validation, and scaling
+- Data is converted to Pandas for ML inference since scikit-learn
+  does not operate on Spark DataFrames
+
+**Tech:**
+- PySpark
+- Pandas
+- scikit-learn
+- Shared model artifact
+
+---
+
+### 🧠 Key Design Principle
+> Use Spark for distributed data processing  
+> Use Pandas / scikit-learn for ML inference
+
+This approach balances scalability and model flexibility without
+rewriting the ML pipeline.
